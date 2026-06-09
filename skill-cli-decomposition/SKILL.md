@@ -89,24 +89,56 @@ astraworks-cli orch mragents <room_id> --json
   "room_id": "!abc123:astraworks.local",
   "agents": [
     {
-      "agent_id": "uuid-xxx",
-      "agent_name": "Coder-1",
-      "virtual_user_id": "@agent_coder1:astraworks.local",
-      "skills": [
-        {
-          "skill_id": "coding",
-          "skill_name": "Coding",
-          "skill_version": "1.0.0",
-          "is_active": true
-        },
-        {
-          "skill_id": "python",
-          "skill_name": "Python",
-          "skill_version": "1.0.0",
-          "is_active": true
+            "agent_id": "00f9758d-4772-4065-a446-2a53c895094d",
+            "agent_instance_id": "00f9758d-4772-4065-a446-2a53c895094d",
+            "agent_name": "worker1",
+            "virtual_user_id": "vu_24e611a74002",
+            "matrix_user_id": "@agent_vu_24e611a74002:astraworks.local",
+            "matrix_status": "active",
+            "instance_id": "0fd17a20-73c9-41ed-b883-38aa8517ec3b-uavn",
+            "definition_id": "0fd17a20-73c9-41ed-b883-38aa8517ec3b",
+            "openclaw_agent_id": "worker1",
+            "status": "idle",
+            "version": "1.0.0",
+            "installed_at": "2026-06-09T04:35:13.290913",
+            "last_heartbeat": "2026-06-09T08:09:31.656711",
+            "node_id": "9706df90-87c6-4636-bae8-6f6ef5790ce0",
+            "definition": {
+                "id": "0fd17a20-73c9-41ed-b883-38aa8517ec3b",
+                "name": "agent-worker1",
+                "display_name": "worker",
+                "description": "worker - 由平台创建",
+                "role": "assistant",
+                "level": "workgroup",
+                "skills": {
+                    "core_skills": [
+                        "git-operations",
+                        "matrix-event-listener",
+                        "workgroup-design",
+                        "skill-document-generator"
+                    ],
+                    "domain_skills": []
+                },
+                "tools": {
+                    "mcp_servers": [],
+                    "tools": []
+                }
+            },
+            "definition_skills": {
+                "core_skills": [
+                    "git-operations",
+                    "matrix-event-listener",
+                    "workgroup-design",
+                    "skill-document-generator"
+                ],
+                "domain_skills": []
+            },
+            "definition_tools": {
+                "mcp_servers": [],
+                "tools": []
+            },
+            "skills": []
         }
-      ]
-    }
   ]
 }
 ```
@@ -165,7 +197,7 @@ astraworks-cli orch mragents <room_id> --json
 
 1. **分析 subtask 需求**：明确每个 subtask 的 `required_skills`
 2. **匹配 Agent**：根据技能选择合适的 Agent
-3. **设置 assignee_role**：将 `virtual_user_id` 填入 `assignee_role` 字段（如 `@agent_coder1:astraworks.local`）
+3. **设置 assignee_role**：将 `matrix_user_id` 填入 `assignee_role` 字段（如 `@agent_coder1:astraworks.local`）
 
 示例分配逻辑：
 
