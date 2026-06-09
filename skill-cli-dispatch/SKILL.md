@@ -123,7 +123,7 @@ astraworks-cli orch platform todos <task_id> --output /tmp/todos.json --json
 | `item_id` | 业务层唯一标识，用于 dag can-dispatch / dispatch |
 | `status` | `pending` \| `in_progress` \| `done` \| `skipped` |
 | `depends_on` | 依赖的 item_id 列表 |
-| `assignee_role` | Agent 虚拟用户 ID（virtual_user_id），用于匹配 Agent 发送消息 |
+| `assignee_role` | Agent 虚拟用户 ID（matrix_user_id），用于匹配 Agent 发送消息 |
 
 **如果指定了 `--output`**，todos 将保存到文件，后续 `dag order` 和 `dispatch` 可直接引用该文件。
 
@@ -169,7 +169,7 @@ astraworks-cli orch dag order /tmp/todos.json --json
 ```
 数据来源:
   - room_id: 从 Step 1 响应的 task.matrix_room_id 获取
-  - virtual_user_id: 从 Step 1 响应的 todo.assignee_role 获取（即 Agent 的 virtual_user_id）
+  - matrix_user_id: 从 Step 1 响应的 todo.assignee_role 获取（即 Agent 的 matrix_user_id）
   - item_id: 从 Step 2 得到的 dispatchable 列表中获取
 ```
 
@@ -183,13 +183,13 @@ astraworks-cli orch dispatch <item_id> --todos-file /tmp/todos.json --json
 
 1. 从 `--todos-file` 加载 todos，查找对应 `item_id` 的 todo。
 2. 调用 can-dispatch 逻辑校验该子任务是否允许分发。
-3. 获取 `room_id`（`task.matrix_room_id`），获取目标 Agent virtual_user_id（`todo.assignee_role`）。
+3. 获取 `room_id`（`task.matrix_room_id`），获取目标 Agent matrix_user_id（`todo.assignee_role`）。
 4. 构造 Matrix 消息，调用 `POST /api/v1/chat/matrix/send` 发送。
 
 ### 3.3 Matrix 消息格式与要求
 
 **Matrix User ID 格式**：
-`assignee_role`（即 `virtual_user_id`）本身已经是完整的 Matrix User ID 格式：
+`assignee_role`（即 `matrix_user_id`）本身已经是完整的 Matrix User ID 格式：
 例如：`assignee_role = "@_astraworks_xxx:astraworks.local"` → 直接使用，无需转换
 
 **发送端信息获取**（当前 Agent）：
@@ -204,8 +204,8 @@ astraworks-cli orch dispatch <item_id> --todos-file /tmp/todos.json --json
 ```json
 {
   "room_id": "<task.matrix_room_id>",
-  "body": "@<displayName> 请完成任务：\n\n\"todo_id\": \"<todo.id>\",\n\"title\": \"<todo.title>\",\n\"description\": \"<todo.description>\",\n\"workgroup_id\": \"<task.workgroup_id || ''>\",\n\"matrix_room_id\": \"<task.matrix_room_id>\"",
-  "html": "<p><span data-type=\"mention\" class=\"mention\" data-id=\"<assignee_role>\" data-label=\"<displayName>\" data-mention-suggestion-char=\"@\" style=\"color: rgb(0, 122, 255); font-weight: 500;\">@<displayName></span> 请完成任务：</p><p>\"todo_id\": \"<todo.id>\",</p><p>\"title\": \"<todo.title>\",</p><p>\"description\": \"<todo.description>\",</p><p>\"workgroup_id\": \"<task.workgroup_id || ''>\",</p><p>\"matrix_room_id\": \"<task.matrix_room_id>\"</p>",
+  "body": "@<displayName> 使用技能：skill-cli-worker完成任务：\n\n\"todo_id\": \"<todo.id>\",\n\"title\": \"<todo.title>\",\n\"description\": \"<todo.description>\",\n\"workgroup_id\": \"<task.workgroup_id || ''>\",\n\"matrix_room_id\": \"<task.matrix_room_id>\"",
+  "html": "<p><span data-type=\"mention\" class=\"mention\" data-id=\"<assignee_role>\" data-label=\"<displayName>\" data-mention-suggestion-char=\"@\" style=\"color: rgb(0, 122, 255); font-weight: 500;\">@<displayName></span> 使用技能：skill-cli-worker完成任务：</p><p>\"todo_id\": \"<todo.id>\",</p><p>\"title\": \"<todo.title>\",</p><p>\"description\": \"<todo.description>\",</p><p>\"workgroup_id\": \"<task.workgroup_id || ''>\",</p><p>\"matrix_room_id\": \"<task.matrix_room_id>\"</p>",
   "sender_id": "<current_agent_matrix_user_id>",
   "sender_name": "<current_agent_display_name>",
   "mentions": ["<assignee_role>"]
