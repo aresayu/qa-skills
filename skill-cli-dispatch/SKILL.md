@@ -50,6 +50,10 @@ Step 4: 生成报告
         所有 Todo 完成后，组装报告发送到Matrix Room
         astraworks-cli orch reprot /tmp/todos.json --json
 
+Step 4.4: 标记任务完成
+        报告发送成功后，调用 forcedone 把 task 置为 done
+        astraworks-cli orch forcedone <task_id> --json
+
 ```
 
 ---
@@ -305,6 +309,41 @@ astraworks-cli orch report --file /tmp/report.json --json
 }
 ```
 
+### 4.4 标记任务完成
+
+报告成功发送到 Matrix Room 后，调用 `forcedone` 把 task 状态置为 `done`。
+
+```bash
+astraworks-cli orch forcedone <task_id> --json
+```
+
+**CLI 内部实现**：
+1. 发送 `PATCH /api/v1/tasks/{task_id}/force-done` 请求
+2. 认证方式：任意有效的 `X-Node-Token`（不校验 node-id 绑定）
+3. 后端直接 `status=done, progress=100, completed_at=now()`，不走状态机
+4. 已是 `done` 时幂等返回（不改字段）
+
+**幂等行为**：若 task 之前已是 done，响应 `idempotent: true`，不做任何修改。
+
+**CLI 返回示例**：
+
+```json
+{
+  "success": true,
+  "task_id": "5e292b1a-d160-483e-8c9d-8d2423ac063d",
+  "status": "done",
+  "progress": 100,
+  "completed_at": "2026-06-10T...",
+  "idempotent": false,
+  "previous_status": "in_review"
+}
+```
+
+**错误处理**：
+- `401`：token 无效或过期，检查 `~/.openclaw/astraworks-connection.json` 的 token
+- `404`：task_id 不存在
+- `400`：task_id 格式非法
+
 ---
 
 ## 错误处理
@@ -326,6 +365,7 @@ astraworks-cli orch report --file /tmp/report.json --json
 | 获取可分发任务 | `astraworks-cli orch dag order <file> --json` |
 | 发送分发 | `astraworks-cli orch dispatch <item_id> --todos-file <file> --json` |
 | 发送报告 | `astraworks-cli orch report --file <report.json> --json` |
+| 标记任务完成 | `astraworks-cli orch forcedone <task_id> --json` |
 
 ---
 
