@@ -259,6 +259,7 @@ if pending_count > 0 or in_progress_count > 0:
 ```json
 {
   "room_id": "<task.matrix_room_id>",
+  "task_id": "<task.id>",
   "task_title": "<task.title>",
   "task_description": "<task.description>",
   "subtasks": [
